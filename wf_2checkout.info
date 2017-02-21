@@ -1,0 +1,5 @@
+name = Webform 2checkout
+description = 2checkout payment integration with Webform.
+package = KrishaWeb Technologies
+core = 7.x
+dependencies[] = webform

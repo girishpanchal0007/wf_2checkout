@@ -1,0 +1,35 @@
+<?php
+
+/**
+ * @file
+ * Webform_2checkout module install/schema hooks.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function wf_2checkout_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'runtime') {
+    $t = get_t();
+    // Check for 2checkout account No.
+    if (variable_get('wf_2checkout_sid')) {
+      $requirements['wf_2checkout_info'] = array(
+        'title' => $t('2checkout Config Detail'),
+        'value' => $t('Configured'),
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    else {
+      $requirements['wf_2checkout_info'] = array(
+        'title' => $t('2checkout Config Detail'),
+        'value' => $t('Not configured'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => $t('2checkout Config Detail are not configured. <a href="!url">Configure them here</a>.', array(
+          '!url' => url('admin/config/services/webform-2checkout'),
+        )),
+      );
+    }
+  }
+  return $requirements;
+}

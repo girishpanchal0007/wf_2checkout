@@ -1,0 +1,200 @@
+<?php
+
+/**
+ * @file
+ * Webform_2checkout Payment integration with webform.
+ *
+ * Webform_2checkout module provides payment gateway (Standard Checkout)
+ * Which help to redirect our form data to 2checkout portal.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function wf_2checkout_permission() {
+  return array(
+    'administer webform 2checkout' => array(
+      'title' => t('Administer Webform 2checkout settings'),
+      'description' => t('Grants access to change 2checkout credentials and settings.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function wf_2checkout_menu() {
+  $items['admin/config/services/webform-2checkout'] = array(
+    'title' => 'Webform 2checkout',
+    'description' => 'Configure 2checkout for Webform.',
+    'access arguments' => array('administer webform 2checkout'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('wf_2checkout_admin_settings_form'),
+    'file' => 'wf_2checkout.admin.inc',
+  );
+  $items['2checkout-success'] = array(
+    'title' => '2checkout success',
+    'description' => 'This will use when 2checkout Webform Payment.',
+    'page callback' => 'wf_2checkout_payment_success',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_webform_component_info().
+ */
+function wf_2checkout_webform_component_info() {
+  $components['wf_2checkout'] = array(
+    'label' => t('2checkout Pay'),
+    'description' => t('Displays a payment button which opens the 2checkout form.'),
+    'features' => array(
+      'analysis' => FALSE,
+      'conditional' => FALSE,
+      'default_value' => FALSE,
+      'email' => FALSE,
+      'description' => FALSE,
+      'required' => FALSE,
+      'private' => FALSE,
+      'title_display' => FALSE,
+      'css_classes' => FALSE,
+    ),
+    'file' => 'wf_2checkout.webform.inc',
+  );
+  return $components;
+}
+
+/**
+ * Custom function which helps to mapping webform component id.
+ */
+function _wf_2checkout_webform_component_mapping($node) {
+  $mapping = array();
+  $components = $node->webform['components'];
+  foreach ($components as $i => $component) {
+    if ($component["type"] == 'wf_2checkout') {
+      $mapping = $i;
+    }
+  }
+  return $mapping;
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for webform_client_form().
+ */
+function wf_2checkout_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
+  foreach ($form['#node']->webform['components'] as $component) {
+    if ($component['type'] === 'wf_2checkout' && isset($form['actions']['submit'])) {
+      // If Previous button is available, hide it.
+      if (isset($form['actions']['previous'])) {
+        $form['actions']['previous']['#access'] = FALSE;
+      }
+      $form['actions']['submit']['#value'] = (!empty($component['extra']['pay_button'])) ? $component['extra']['pay_button'] : '2checkout Pay';
+      $form['actions']['submit']['#attributes'] = array('class' => array('webform-2checkout-pay'));
+      $form['#submit'][] = 'wf_2checkout_process_payment';
+    }
+  }
+}
+
+/**
+ * Submit function to send user to 2checkout payment after form values saved.
+ */
+function wf_2checkout_process_payment(&$form, &$form_state) {
+  // Get submission id.
+  $submission_id = $form_state['values']['details']['sid'];
+  // Get node id.
+  $nid = $form_state['values']['details']['nid'];
+  // Filter webform fields.
+  $payment_amount = '';
+  $webform_components = $form_state['webform']['component_tree']['children'];
+  foreach ($webform_components as $value) {
+    if ($value['type'] == 'wf_2checkout') {
+      $amount_field = $webform_components[$value['extra']['amount_component']];
+      $amount_key = $amount_field["form_key"];
+      $payment_amount = $_POST["submitted"][$amount_key];
+    }
+  }
+  $send_data = array();
+  // Account Number.
+  $send_data['sid'] = variable_get('wf_2checkout_sid');
+  // Payment Mode.
+  $send_data['mode'] = '2CO';
+  // Product ID.
+  $send_data['li_0_product_id'] = '1';
+  // Product Type.
+  $send_data['li_0_type'] = 'product';
+  // Name of product.
+  $send_data['li_0_name'] = (variable_get('wf_2checkout_li_0_name')) ? variable_get('wf_2checkout_li_0_name') : 'product';
+  // Product Price.
+  $send_data['li_0_price'] = $payment_amount;
+  // Payment currency code.
+  $send_data['currency_code'] = variable_get('wf_2checkout_currency_code');
+  // Payment language.
+  $send_data['lang'] = variable_get('wf_2checkout_lang');
+  // Order Id.
+  $send_data['merchant_order_id'] = $submission_id;
+  // Custom extra field which has contained webform node id.
+  $send_data['node_id'] = $nid;
+  // Extra detail.
+  foreach ($_POST['submitted'] as $keys => $post_value) {
+    if (empty($post_value)) {
+      unset($_POST['submitted'][$keys]);
+    }
+    else {
+      $send_data[$keys] = $post_value;
+    }
+  }
+  drupal_goto(variable_get('wf_2checkout_payment_mode'), array('query' => $send_data));
+}
+
+/**
+ * Custom function which handles submission update and return on thank you.
+ */
+function wf_2checkout_payment_success() {
+  if (isset($_REQUEST) && !empty($_REQUEST)) {
+    $secretword = variable_get('wf_2checkout_hashsecretword');
+    $account_number = variable_get('wf_2checkout_sid');
+    $grand_totla = $_REQUEST['total'];
+    $order_id = $_REQUEST['order_number'];
+    $stringToHash = strtoupper(md5($secretword . $account_number . $order_id . $grand_totla));
+    // Checking stringtohash with response key.
+    if ($stringToHash != $_REQUEST['key']) {
+      $result = t('2checkout payment was failed');
+    }
+    else {
+      $sid = $_REQUEST['merchant_order_id'];
+      $nid = $_REQUEST['node_id'];
+      $node = node_load($nid);
+      // Load submission.
+      module_load_include('inc', 'webform', 'webform.module');
+      module_load_include('inc', 'webform', 'includes/webform.submissions');
+      $order_value = webform_get_submissions($nid);
+
+      $map = _wf_2checkout_webform_component_mapping($node);
+      $order_value[$sid]->data[$map][0] = $_REQUEST['order_number'];
+      // Update submission fields.
+      foreach ($order_value[$sid]->data as $cid => $values) {
+        foreach ($values as $value) {
+          // Update submission data.
+          db_update('webform_submitted_data')
+            ->fields(array(
+              'data' => $value,
+            ))
+            ->condition('nid', $nid)
+            ->condition('sid', $sid)
+            ->condition('cid', $cid)
+            ->execute();
+        }
+      }
+      // Send Email for payment.
+      $last_submission = webform_get_submission($nid, $sid);
+      webform_submission_send_mail($node, $last_submission);
+      $result = t('2checkout payment was successful.');
+    }
+  }
+  else {
+    $result = t('2Checkout payment was not success. Please try again');
+  }
+  return $result;
+}
