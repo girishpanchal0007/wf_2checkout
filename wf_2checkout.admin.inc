@@ -11,10 +11,7 @@
 function wf_2checkout_admin_settings_form() {
   $form['wf_2checkout_info'] = array(
     '#type' => 'fieldset',
-    '#title' => t('2checkout Config Detail'),
-    '#description' => t('The test or live detail from <a href="!url">your dashboard</a>.',
-      array('!url' => 'https://sandbox.2checkout.com/sandbox/home/dashboard/')
-    ),
+    '#title' => t('2checkout Configuration Detail.'),
   );
   $form['wf_2checkout_info']['wf_2checkout_sid'] = array(
     '#type' => 'textfield',
@@ -43,13 +40,13 @@ function wf_2checkout_admin_settings_form() {
       'https://www.2checkout.com/checkout/purchase' => t('Live'),
       'https://sandbox.2checkout.com/checkout/purchase' => t('Testing/Sandbox'),
     ),
-    '#description' => t('To check Testing/Sandbox payment, you must have a <a href="https://sandbox.2checkout.com/sandbox/">Sandbox Account</a> set up with 2Checkout.'),
+    '#description' => t('To check Testing/Sandbox payment, you must have a <a href="https://sandbox.2checkout.com/sandbox/home/dashboard/" target="_blank">Sandbox Account</a> set up with 2Checkout.'),
     '#required' => TRUE,
     '#default_value' => variable_get('wf_2checkout_payment_mode', ''),
   );
   $form['wf_2checkout_info']['wf_2checkout_currency_code'] = array(
     '#type' => 'select',
-    '#title' => t('Currency Code'),
+    '#title' => t('Currency code'),
     '#description' => t('This is your payment currency.'),
     '#options' => array(
       'USD' => t('USD'),
@@ -64,7 +61,7 @@ function wf_2checkout_admin_settings_form() {
   );
   $form['wf_2checkout_info']['wf_2checkout_lang'] = array(
     '#type' => 'select',
-    '#title' => t('Language'),
+    '#title' => t('Payment language'),
     '#description' => t('This is your payment language.'),
     '#options' => array(
       'en' => t('English'),
@@ -78,11 +75,17 @@ function wf_2checkout_admin_settings_form() {
     '#required' => TRUE,
     '#default_value' => variable_get('wf_2checkout_lang', ''),
   );
-  $form['wf_2checkout_info']['wf_2checkout_thankyou'] = array(
+  $form['wf_2checkout_info']['wf_2checkout_cancel_msg'] = array(
     '#type' => 'textfield',
-    '#title' => t('Success Page Description'),
-    '#description' => t('This is your thank you page description.'),
-    '#default_value' => variable_get('wf_2checkout_thankyou', ''),
+    '#title' => t('Payment cancel message.'),
+    '#description' => t('This is your thank you page payment cancel message.'),
+    '#default_value' => variable_get('wf_2checkout_cancel_msg', ''),
+  );
+  $form['wf_2checkout_info']['wf_2checkout_success_msg'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Payment success message.'),
+    '#description' => t('This is your thank you page payment success message.'),
+    '#default_value' => variable_get('wf_2checkout_success_msg', ''),
   );
   return system_settings_form($form);
 }

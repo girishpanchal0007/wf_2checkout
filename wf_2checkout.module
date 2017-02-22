@@ -9,6 +9,16 @@
  */
 
 /**
+ * Implements hook_help().
+ */
+function wf_2checkout_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/services/webform-2checkout':
+      return '<p>' . t('Below is the some required configuration of 2checkout standard payment with a webform. See the module README.txt file for more information about 2checkout configuration.') . '</p>';
+  }
+}
+
+/**
  * Implements hook_permission().
  */
 function wf_2checkout_permission() {
@@ -160,7 +170,7 @@ function wf_2checkout_payment_success() {
     $stringToHash = strtoupper(md5($secretword . $account_number . $order_id . $grand_totla));
     // Checking stringtohash with response key.
     if ($stringToHash != $_REQUEST['key']) {
-      $result = t('2checkout payment was failed');
+      $result = variable_get('wf_2checkout_cancel_msg') ? variable_get('wf_2checkout_cancel_msg') : t('2checkout payment was failed');
     }
     else {
       $sid = $_REQUEST['merchant_order_id'];
@@ -190,11 +200,11 @@ function wf_2checkout_payment_success() {
       // Send Email for payment.
       $last_submission = webform_get_submission($nid, $sid);
       webform_submission_send_mail($node, $last_submission);
-      $result = t('2checkout payment was successful.');
+      $result = variable_get('wf_2checkout_success_msg') ? variable_get('wf_2checkout_success_msg') : t('2checkout payment was successful.');
     }
   }
   else {
-    $result = t('2Checkout payment was not success. Please try again');
+    $result = t('Thank you for submission. 2Checkout payment was not success. Please try again.');
   }
   return $result;
 }

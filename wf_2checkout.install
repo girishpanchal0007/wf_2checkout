@@ -15,7 +15,7 @@ function wf_2checkout_requirements($phase) {
     // Check for 2checkout account No.
     if (variable_get('wf_2checkout_sid')) {
       $requirements['wf_2checkout_info'] = array(
-        'title' => $t('2checkout Config Detail'),
+        'title' => $t('2checkout config details'),
         'value' => $t('Configured'),
         'severity' => REQUIREMENT_OK,
       );
@@ -25,7 +25,7 @@ function wf_2checkout_requirements($phase) {
         'title' => $t('2checkout Config Detail'),
         'value' => $t('Not configured'),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('2checkout Config Detail are not configured. <a href="!url">Configure them here</a>.', array(
+        'description' => $t('2checkout config details are not configured. <a href="!url">Configure them here</a>.', array(
           '!url' => url('admin/config/services/webform-2checkout'),
         )),
       );
