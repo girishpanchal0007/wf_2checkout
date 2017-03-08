@@ -97,7 +97,7 @@ function _webform_display_wf_2checkout($component, $value, $format = 'html', $su
   if (isset($value[0])) {
     return array(
       '#type' => 'markup',
-      '#title' => $component['name'] . t(' Invoice ID'),
+      '#title' => $component['name'] . ' ' . t('Invoice ID'),
       '#markup' => $value[0],
       '#weight' => $component['weight'],
       '#theme_wrappers' => $format == 'html' ? array('webform_element') : array('webform_element_text'),
