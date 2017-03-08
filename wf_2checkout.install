@@ -33,3 +33,18 @@ function wf_2checkout_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function wf_2checkout_uninstall() {
+  // Unset wf_2checkout variables.
+  variable_get('wf_2checkout_sid');
+  variable_get('wf_2checkout_hashsecretword');
+  variable_get('wf_2checkout_li_0_name');
+  variable_get('wf_2checkout_payment_mode');
+  variable_get('wf_2checkout_currency_code');
+  variable_get('wf_2checkout_lang');
+  variable_get('wf_2checkout_cancel_msg');
+  variable_get('wf_2checkout_success_msg');
+}
