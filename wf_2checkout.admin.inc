@@ -29,8 +29,8 @@ function wf_2checkout_admin_settings_form() {
   );
   $form['wf_2checkout_info']['wf_2checkout_li_0_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('Payment for what?'),
-    '#description' => t('The payment is making for what?.'),
+    '#title' => t('Name'),
+    '#description' => t('The name of your company/website/NGO.'),
     '#default_value' => variable_get('wf_2checkout_li_0_name', ''),
   );
   $form['wf_2checkout_info']['wf_2checkout_payment_mode'] = array(

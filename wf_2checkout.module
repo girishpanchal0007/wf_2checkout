@@ -111,6 +111,7 @@ function wf_2checkout_form_webform_client_form_alter(&$form, &$form_state, $form
  * Submit function to send user to 2checkout payment after form values saved.
  */
 function wf_2checkout_process_payment(&$form, &$form_state) {
+  global $base_url;
   // Get submission id.
   $submission_id = $form_state['values']['details']['sid'];
   // Get node id.
@@ -130,14 +131,18 @@ function wf_2checkout_process_payment(&$form, &$form_state) {
   $send_data['sid'] = variable_get('wf_2checkout_sid');
   // Payment Mode.
   $send_data['mode'] = '2CO';
-  // Product ID.
-  $send_data['li_0_product_id'] = '1';
   // Product Type.
   $send_data['li_0_type'] = 'product';
   // Name of product.
-  $send_data['li_0_name'] = (variable_get('wf_2checkout_li_0_name')) ? variable_get('wf_2checkout_li_0_name') : 'product';
+  $send_data['li_0_name'] = (variable_get('wf_2checkout_li_0_name')) ? variable_get('wf_2checkout_li_0_name') : 'Donation';
+  // Quantiy of product Default 1.
+  $send_data['li_0_quantity'] = 1;
   // Product Price.
   $send_data['li_0_price'] = $payment_amount;
+  // Product is tangible or intangible.
+  $send_data['li_0_tangible'] = 'N';
+  // Product ID.
+  $send_data['li_0_product_id'] = 1;
   // Payment currency code.
   $send_data['currency_code'] = variable_get('wf_2checkout_currency_code');
   // Payment language.
@@ -146,6 +151,8 @@ function wf_2checkout_process_payment(&$form, &$form_state) {
   $send_data['merchant_order_id'] = $submission_id;
   // Custom extra field which has contained webform node id.
   $send_data['node_id'] = $nid;
+  // Payment response will get back at this URL.
+  $send_data['x_receipt_link_url'] = $base_url . '/2checkout-success';
   // Extra detail.
   foreach ($_POST['submitted'] as $keys => $post_value) {
     if (empty($post_value)) {
