@@ -15,7 +15,6 @@ function _webform_defaults_wf_2checkout() {
     'pid' => 0,
     'weight' => 0,
     'value' => '',
-    'required' => 0,
     'extra' => array(
       'amount' => 0,
       'amount_component' => '',
