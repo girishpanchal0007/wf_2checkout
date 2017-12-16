@@ -64,10 +64,8 @@ function wf_2checkout_webform_component_info() {
 			'analysis' => FALSE,
 			'conditional' => FALSE,
 			'default_value' => FALSE,
-			'email' => FALSE,
-			'description' => FALSE,
+			'email' => TRUE,
 			'required' => FALSE,
-			'private' => FALSE,
 			'title_display' => FALSE,
 			'css_classes' => FALSE,
 		),
@@ -111,7 +109,7 @@ function wf_2checkout_form_webform_client_form_alter(&$form, &$form_state, $form
  * Submit function to send user to 2checkout payment after form values saved.
  */
 function wf_2checkout_process_payment(&$form, &$form_state) {
-	global $base_url;
+	global $base_url, $user;
 	// Get submission id.
 	$submission_id = $form_state['values']['details']['sid'];
 	// Get node id.
@@ -121,9 +119,16 @@ function wf_2checkout_process_payment(&$form, &$form_state) {
 	$webform_components = $form_state['webform']['component_tree']['children'];
 	foreach ($webform_components as $value) {
 		if ($value['type'] == 'wf_2checkout') {
+			// Amount component.
 			$amount_field = $webform_components[$value['extra']['amount_component']];
 			$amount_key = $amount_field["form_key"];
 			$payment_amount = $_POST["submitted"][$amount_key];
+			// Email component.
+			if (isset($webform_components[$value['extra']['email_component']])) {
+				$email_field = $webform_components[$value['extra']['email_component']];
+				$email_key = $email_field["form_key"];
+				$email_id = $_POST["submitted"][$email_key];
+			}
 		}
 	}
 	$send_data = array();
@@ -151,6 +156,15 @@ function wf_2checkout_process_payment(&$form, &$form_state) {
 	$send_data['merchant_order_id'] = $submission_id;
 	// Custom extra field which has contained webform node id.
 	$send_data['node_id'] = $nid;
+	// Email id of logged-in user or form component email field.
+	if (isset($email_id)) {
+		$send_data['email'] = $email_id;
+	}
+	else {
+		$send_data['email'] = $user->mail;
+	}
+	// Default send site country.
+	$send_data['country'] = variable_get('site_default_country');
 	// Payment response will get back at this URL.
 	$send_data['x_receipt_link_url'] = $base_url . '/2checkout-success';
 	// Extra detail.

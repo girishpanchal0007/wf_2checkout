@@ -18,6 +18,8 @@ function _webform_defaults_wf_2checkout() {
     'extra' => array(
       'amount' => 0,
       'amount_component' => '',
+      'select_email' => '',
+      'email_component' => '',
       'pay_button' => '',
     ),
   );
@@ -29,7 +31,7 @@ function _webform_defaults_wf_2checkout() {
 function _webform_edit_wf_2checkout($component) {
   $node = node_load($component['nid']);
   $form = array();
-
+  // Mapping exists field of amount.
   $form['amount'] = array(
     '#type' => 'fieldset',
     '#title' => t('Amount'),
@@ -37,6 +39,7 @@ function _webform_edit_wf_2checkout($component) {
     '#tree' => TRUE,
     '#parents' => array('extra'),
   );
+  // Checking exists fields for amount.
   $amount_components = array();
   foreach ($node->webform['components'] as $other_component) {
     $component_type = $other_component['type'];
@@ -47,14 +50,55 @@ function _webform_edit_wf_2checkout($component) {
       $amount_components[$other_component['cid']] = check_plain($other_component['name']);
     }
   }
+  // Dynamic component.
   $form['amount']['amount_component'] = array(
     '#type' => 'select',
     '#title' => t('Amount Field'),
-    '#description' => t("Here you can select dynamic amount field using previously fields and this component which will determine the amount charged. Include(Textfield, Number, Select)."),
+    '#description' => t("Here you can select dynamic amount field using previously fields and this component which will determine the amount. Include(Textfield, Number, Select)."),
     '#options' => $amount_components,
-    '#empty_option' => '- ' . t('Select a component') . ' -',
+    '#empty_option' => t('Select a component'),
     '#default_value' => $component['extra']['amount_component'],
   );
+  // Email field.
+  $form['email'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('E-mail'),
+    '#collapsible' => TRUE,
+    '#tree' => TRUE,
+    '#parents' => array('extra'),
+  );
+  // select email options.
+  $form['email']['select_email'] = array(
+    '#type' => 'radios',
+    '#title' => t('E-mail address'),
+    '#options' => array(
+      'user' => t('Logged-in user email address'),
+      'component' => t('Dynamic email address'),
+    ),
+    '#default_value' => $component['extra']['select_email'],
+    '#required' => TRUE,
+  );
+  // Dynamic email component.
+  $email_component = array();
+  foreach ($node->webform['components'] as $related_component) {
+    if (in_array($related_component['type'], array('email'))) {
+      $email_component[$related_component['cid']] = $related_component['name'];
+    }
+  }
+  $form['email']['email_component'] = array(
+    '#type' => 'select',
+    '#title' => t('Dynamic email address'),
+    '#description' => t("Sets the email component which uses for the email address. Eligible components include: Email."),
+    '#options' => $email_component,
+    '#empty_option' => t('Select component'),
+    '#default_value' => $component['extra']['email_component'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name="extra[select_email]"]' => array('value' => 'component'),
+      ),
+    ),
+  );
+  // Pay button.
   $form['form_button'] = array(
     '#type' => 'fieldset',
     '#title' => t('Form Button'),
