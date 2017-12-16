@@ -67,7 +67,7 @@ function _webform_edit_wf_2checkout($component) {
     '#tree' => TRUE,
     '#parents' => array('extra'),
   );
-  // select email options.
+  // Select email options.
   $form['email']['select_email'] = array(
     '#type' => 'radios',
     '#title' => t('E-mail address'),
