@@ -35,16 +35,16 @@ function wf_2checkout_permission() {
  */
 function wf_2checkout_menu() {
   $items['admin/config/services/webform-2checkout'] = array(
-    'title' => t('Webform 2checkout'),
-    'description' => t('Configure 2checkout for Webform.'),
+    'title' => 'Webform 2checkout',
+    'description' => 'Configure 2checkout for Webform.',
     'access arguments' => array('administer webform 2checkout'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('wf_2checkout_admin_settings_form'),
     'file' => 'wf_2checkout.admin.inc',
   );
   $items['2checkout-success'] = array(
-    'title' => t('2checkout success'),
-    'description' => t('This will use when 2checkout Webform Payment.'),
+    'title' => '2checkout success',
+    'description' => 'This will use when 2checkout Webform Payment.',
     'page callback' => 'wf_2checkout_payment_success',
     'page arguments' => array(1),
     'access arguments' => array('access content'),
