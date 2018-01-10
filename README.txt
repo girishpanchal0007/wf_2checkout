@@ -38,7 +38,7 @@ INSTALLATION
 ------------
 
 - Download wf_2checkout module form drupal.org.
-  (https://drupal.org/projects/uc_quickpay)
+  (https://www.drupal.org/project/wf_2checkout)
 
 - Login as an administrator. Enable the module from Administer » Modules.
 
