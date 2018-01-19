@@ -37,7 +37,8 @@ This module requires the following modules:
 INSTALLATION
 ------------
 
-- Download wf_2checkout module form drupal.org.
+- Download wf_2checkout module form drupal.org and put 
+  in sites/all/modules directory.
   (https://www.drupal.org/project/wf_2checkout)
 
 - Login as an administrator. Enable the module from Administer » Modules.

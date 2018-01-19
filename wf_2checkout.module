@@ -13,7 +13,7 @@
  */
 function wf_2checkout_help($path, $arg) {
   switch ($path) {
-    case 'admin/config/services/webform-2checkout':
+    case 'admin/help#wf_2checkout':
       return '<p>' . t('Below is the some required configuration of 2checkout standard payment with a webform. See the module README.txt file for more information about 2checkout configuration.') . '</p>';
   }
 }
