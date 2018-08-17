@@ -14,7 +14,7 @@
 function wf_2checkout_help($path, $arg) {
   switch ($path) {
     case 'admin/help#wf_2checkout':
-      return '<p>' . t('Below is the some required configuration of 2checkout standard payment with a webform. See the module README.txt file for more information about 2checkout configuration.') . '</p>';
+      return '<p>' . t('Below is the some required configuration of 2checkout standard payment with the webform. See the module README.txt file for more information about 2checkout configuration.') . '</p>';
   }
 }
 
@@ -24,7 +24,7 @@ function wf_2checkout_help($path, $arg) {
 function wf_2checkout_permission() {
   return array(
     'administer webform 2checkout' => array(
-      'title' => t('Administer Webform 2checkout settings'),
+      'title' => t('Administer webform 2checkout settings'),
       'description' => t('Grants access to change 2checkout credentials and settings.'),
     ),
   );
@@ -36,15 +36,15 @@ function wf_2checkout_permission() {
 function wf_2checkout_menu() {
   $items['admin/config/services/webform-2checkout'] = array(
     'title' => 'Webform 2checkout',
-    'description' => 'Configure 2checkout for Webform.',
+    'description' => 'Configuration page of webform 2checkout payment.',
     'access arguments' => array('administer webform 2checkout'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('wf_2checkout_admin_settings_form'),
+    'page arguments' => array('wf_2checkout_settings_form'),
     'file' => 'wf_2checkout.admin.inc',
   );
   $items['2checkout-success'] = array(
     'title' => '2checkout success',
-    'description' => 'This will use when 2checkout Webform Payment.',
+    'description' => 'This is 2checkout webform payment success page.',
     'page callback' => 'wf_2checkout_payment_success',
     'page arguments' => array(1),
     'access arguments' => array('access content'),
@@ -122,12 +122,12 @@ function wf_2checkout_process_payment(&$form, &$form_state) {
       // Amount component.
       $amount_field = $webform_components[$value['extra']['amount_component']];
       $amount_key = $amount_field["form_key"];
-      $payment_amount = $_POST["submitted"][$amount_key];
+      $payment_amount = filter_xss($_POST["submitted"][$amount_key]);
       // Email component.
       if (isset($webform_components[$value['extra']['email_component']])) {
         $email_field = $webform_components[$value['extra']['email_component']];
         $email_key = $email_field["form_key"];
-        $email_id = $_POST["submitted"][$email_key];
+        $email_id = filter_xss($_POST["submitted"][$email_key]);
       }
     }
   }
@@ -186,16 +186,16 @@ function wf_2checkout_payment_success() {
   if (isset($_REQUEST['key']) && !empty($_REQUEST['key'])) {
     $secretword = variable_get('wf_2checkout_hashsecretword');
     $account_number = variable_get('wf_2checkout_sid');
-    $grand_totla = $_REQUEST['total'];
-    $order_id = $_REQUEST['order_number'];
+    $grand_totla = filter_xss($_REQUEST['total']);
+    $order_id = filter_xss($_REQUEST['order_number']);
     $stringToHash = strtoupper(md5($secretword . $account_number . $order_id . $grand_totla));
     // Checking stringtohash with response key.
-    if ($stringToHash != $_REQUEST['key']) {
-      $result = variable_get('wf_2checkout_cancel_msg') ? variable_get('wf_2checkout_cancel_msg') : t('2checkout payment was failed');
+    if ($stringToHash != filter_xss($_REQUEST['key'])) {
+      $result = variable_get('wf_2checkout_cancel_msg') ? variable_get('wf_2checkout_cancel_msg') : t('2checkout payment has been failed.');
     }
     else {
-      $sid = $_REQUEST['merchant_order_id'];
-      $nid = $_REQUEST['node_id'];
+      $sid = filter_xss($_REQUEST['merchant_order_id']);
+      $nid = filter_xss($_REQUEST['node_id']);
       $node = node_load($nid);
       // Load submission.
       module_load_include('inc', 'webform', 'webform.module');
@@ -203,7 +203,7 @@ function wf_2checkout_payment_success() {
       $order_value = webform_get_submissions($nid);
 
       $map = _wf_2checkout_webform_component_mapping($node);
-      $order_value[$sid]->data[$map][0] = $_REQUEST['order_number'];
+      $order_value[$sid]->data[$map][0] = filter_xss($_REQUEST['order_number']);
       // Update submission fields.
       foreach ($order_value[$sid]->data as $cid => $values) {
         foreach ($values as $value) {
@@ -225,7 +225,7 @@ function wf_2checkout_payment_success() {
     }
   }
   else {
-    $result = t('Thank you for submission. 2Checkout payment was not success. Please try again.');
+    $result = t('Thank you for the submission. 2Checkout payment is not successful. Please try again.');
   }
   return $result;
 }

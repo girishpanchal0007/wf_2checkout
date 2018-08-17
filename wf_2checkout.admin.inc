@@ -8,10 +8,10 @@
 /**
  * Implements hook_settings_form().
  */
-function wf_2checkout_admin_settings_form() {
+function wf_2checkout_settings_form() {
   $form['wf_2checkout_info'] = array(
     '#type' => 'fieldset',
-    '#title' => t('2checkout Configuration Detail.'),
+    '#title' => t('2checkout Configuration Details.'),
   );
   $form['wf_2checkout_info']['wf_2checkout_sid'] = array(
     '#type' => 'textfield',
@@ -78,13 +78,13 @@ function wf_2checkout_admin_settings_form() {
   $form['wf_2checkout_info']['wf_2checkout_cancel_msg'] = array(
     '#type' => 'textfield',
     '#title' => t('Payment cancel message.'),
-    '#description' => t('This is your thank you page payment cancel message.'),
+    '#description' => t('This is thank-you page payment cancel message.'),
     '#default_value' => variable_get('wf_2checkout_cancel_msg', ''),
   );
   $form['wf_2checkout_info']['wf_2checkout_success_msg'] = array(
     '#type' => 'textfield',
     '#title' => t('Payment success message.'),
-    '#description' => t('This is your thank you page payment success message.'),
+    '#description' => t('This is thank-you page payment success message.'),
     '#default_value' => variable_get('wf_2checkout_success_msg', ''),
   );
   return system_settings_form($form);

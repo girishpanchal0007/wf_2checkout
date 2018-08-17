@@ -15,6 +15,8 @@ web form feature.
 
 We have also added the custom payment success page.
 Once user will complete the payment, he will get redirected to that page.
+For this, You will need to enter success page URL into your
+2checkout account.
 Admin can set the custom message for the payment success
 and payment failure. It will help admin to verify the payment details.
 

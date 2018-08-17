@@ -1,5 +1,5 @@
 name = Webform 2checkout
-description = 2checkout payment integration with Webform.
+description = 2checkout payment integration with Webform. This helps to make payment with the webform.
 package = Webform
 core = 7.x
 dependencies[] = webform

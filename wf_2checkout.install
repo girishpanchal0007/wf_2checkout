@@ -12,17 +12,17 @@ function wf_2checkout_requirements($phase) {
   $requirements = array();
   if ($phase == 'runtime') {
     $t = get_t();
-    // Check for 2checkout account No.
+    // Check the 2checkout account is configured or not.
     if (variable_get('wf_2checkout_sid')) {
       $requirements['wf_2checkout_info'] = array(
-        'title' => $t('2checkout config details'),
+        'title' => $t('2checkout configuration details'),
         'value' => $t('Configured'),
         'severity' => REQUIREMENT_OK,
       );
     }
     else {
       $requirements['wf_2checkout_info'] = array(
-        'title' => $t('2checkout Config Detail'),
+        'title' => $t('2checkout configuration detail'),
         'value' => $t('Not configured'),
         'severity' => REQUIREMENT_ERROR,
         'description' => $t('2checkout config details are not configured. <a href="!url">Configure them here</a>.', array(
