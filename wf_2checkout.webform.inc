@@ -21,6 +21,7 @@ function _webform_defaults_wf_2checkout() {
       'select_email' => '',
       'email_component' => '',
       'pay_button' => '',
+      'private' => FALSE,
     ),
   );
 }
@@ -110,7 +111,7 @@ function _webform_edit_wf_2checkout($component) {
     '#type' => 'textfield',
     '#title' => t('Pay button label'),
     '#description' => t('This is used for the button which opens the 2checkout payment form. Default: <em>%default</em>',
-      array('%default' => '')
+      array('%default' => 'Pay Now')
     ),
     '#default_value' => $component['extra']['pay_button'],
     '#parents' => array('extra', 'pay_button'),

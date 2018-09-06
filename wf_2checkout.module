@@ -77,7 +77,7 @@ function wf_2checkout_webform_component_info() {
 /**
  * Custom function which helps to mapping webform component id.
  */
-function _wf_2checkout_webform_component_mapping($node) {
+function wf_2checkout_webform_component_mapping($node) {
   $mapping = array();
   $components = $node->webform['components'];
   foreach ($components as $i => $component) {
@@ -121,13 +121,13 @@ function wf_2checkout_process_payment(&$form, &$form_state) {
     if ($value['type'] == 'wf_2checkout') {
       // Amount component.
       $amount_field = $webform_components[$value['extra']['amount_component']];
-      $amount_key = $amount_field["form_key"];
-      $payment_amount = filter_xss($_POST["submitted"][$amount_key]);
+      $amount_key = $amount_field["cid"];
+      $payment_amount = filter_xss($form_state['values']['submitted'][$amount_key]);
       // Email component.
       if (isset($webform_components[$value['extra']['email_component']])) {
         $email_field = $webform_components[$value['extra']['email_component']];
-        $email_key = $email_field["form_key"];
-        $email_id = filter_xss($_POST["submitted"][$email_key]);
+        $email_key = $email_field["cid"];
+        $email_id = filter_xss($form_state['values']['submitted'][$email_key]);
       }
     }
   }
@@ -202,7 +202,7 @@ function wf_2checkout_payment_success() {
       module_load_include('inc', 'webform', 'includes/webform.submissions');
       $order_value = webform_get_submissions($nid);
 
-      $map = _wf_2checkout_webform_component_mapping($node);
+      $map = wf_2checkout_webform_component_mapping($node);
       $order_value[$sid]->data[$map][0] = filter_xss($_REQUEST['order_number']);
       // Update submission fields.
       foreach ($order_value[$sid]->data as $cid => $values) {
